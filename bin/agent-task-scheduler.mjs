@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { schedulerFromConfig } from '../lib/index.mjs';
 
-const HELP = `agent-task-scheduler <plan|run|watch|status|approve|retry> --config <file> [--task <id>]
+const HELP = `agent-task-scheduler <plan|run|watch|status|approve|retry> [--config <file>] [--env-file <file>] [--task <id>]
 
 plan     Read tasks and live quotas; preview admissions without starting agents
 run      Execute immediately eligible tasks; exit when no more can start
@@ -18,11 +18,10 @@ async function main() {
   if (!['plan', 'run', 'watch', 'status', 'approve', 'retry'].includes(command)) throw new Error(`Unknown command: ${command}`);
   const opts = {};
   for (let i = 0; i < args.length; i += 2) {
-    if (!['--config', '--task'].includes(args[i]) || !args[i + 1]) throw new Error('Expected --config <file> and optional --task <id>');
+    if (!['--config', '--env-file', '--task'].includes(args[i]) || !args[i + 1]) throw new Error('Expected --config <file>, --env-file <file>, or --task <id>');
     opts[args[i].slice(2)] = args[i + 1];
   }
-  if (!opts.config) throw new Error('--config is required');
-  const scheduler = await schedulerFromConfig(opts.config, { onEvent: event => console.error(JSON.stringify(event)) });
+  const scheduler = await schedulerFromConfig(opts.config, { envFile: opts['env-file'], onEvent: event => console.error(JSON.stringify(event)) });
   if (command === 'plan') { console.log(JSON.stringify(await scheduler.plan(), null, 2)); return; }
   if (command === 'status') { console.log(JSON.stringify(await scheduler.store.read(), null, 2)); return; }
   if (command === 'approve' || command === 'retry') {

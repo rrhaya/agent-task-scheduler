@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "stateDir": "${AGENT_TASK_STATE_DIR}",
+  "sources": [
+    {
+      "type": "github-issues",
+      "repository": "${AGENT_TASK_REPOSITORY}",
+      "cwd": "${AGENT_TASK_WORKSPACE}",
+      "labels": ["${AGENT_TASK_LABEL:-agent-ready}"],
+      "agent": "auto"
+    }
+  ],
+  "agents": {
+    "codex": {
+      "type": "codex",
+      "command": "${AGENT_TASK_CODEX_COMMAND:-codex}",
+      "sandbox": "workspace-write"
+    }
+  },
+  "maxParallel": "${AGENT_TASK_MAX_PARALLEL:-3}",
+  "pollIntervalMs": "${AGENT_TASK_POLL_INTERVAL_MS:-60000}",
+  "policy": {
+    "reservePercent": "${AGENT_TASK_RESERVE_PERCENT:-20}",
+    "weeklyReservePercent": "${AGENT_TASK_WEEKLY_RESERVE_PERCENT:-30}",
+    "safetyFactor": 1.5
+  }
+}

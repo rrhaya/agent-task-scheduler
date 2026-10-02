@@ -75,6 +75,38 @@ agent-task-scheduler approve --config /path/to/scheduler.json --task alice.proje
 
 Approval changes local state only. It does not merge or close the Issue. Dependent workers branch from the local checkout's current `HEAD`, so **integrate their prerequisites before approving them**. If an executed task's title/body/metadata changes, use a new Issue/task ID or restore the original definition. This prevents silently resuming an old session against new instructions.
 
+## Personal settings through environment variables
+
+Use [examples/personal-scheduler.json](examples/personal-scheduler.json) with [.env.example](.env.example). This avoids committing your repository names, checkout paths, or personal settings:
+
+```sh
+cp .env.example .env
+# Edit .env: repository, checkout and private state directory.
+agent-task-scheduler plan --env-file .env
+agent-task-scheduler watch --env-file .env
+```
+
+The file contains `AGENT_SCHEDULER_CONFIG=examples/personal-scheduler.json`, so `--config` is optional. An explicit `--config` takes precedence. `.env` files are **not automatically discovered**: opt in using `--env-file`. Process environment variables override values from that file. `schedulerFromConfig(file, {envFile, env})` supports the same behavior for library consumers without modifying `process.env`.
+
+| Variable in the personal example | Purpose | Default |
+|---|---|---|
+| `AGENT_SCHEDULER_CONFIG` | Configuration file; CLI `--config` overrides it | Required if no `--config` |
+| `AGENT_TASK_REPOSITORY` | GitHub `owner/repo` | Required |
+| `AGENT_TASK_WORKSPACE` | Local checkout | Required |
+| `AGENT_TASK_STATE_DIR` | Private state directory | Required |
+| `AGENT_TASK_LABEL` | Issue label | `agent-ready` |
+| `AGENT_TASK_MAX_PARALLEL` | Concurrent workers | `3` |
+| `AGENT_TASK_POLL_INTERVAL_MS` | Poll interval | `60000` |
+| `AGENT_TASK_RESERVE_PERCENT` | Short-window reserve | `20` |
+| `AGENT_TASK_WEEKLY_RESERVE_PERCENT` | Weekly reserve | `30` |
+| `AGENT_TASK_CODEX_COMMAND` | Codex executable | `codex` |
+
+Any JSON **string value** supports `${NAME}` and `${NAME:-default}`. Required unset/empty variables cause an error before execution. Numeric scheduling/policy values are validated after expansion. Object keys are not expanded. Substitution is single-pass and is applied after parsing JSON, so quotes or newlines in a value cannot inject new JSON fields. This also works for local source paths, model names, Claude executable paths, and explicitly configured agent `env` values.
+
+The dotenv reader accepts `KEY=value`, simple single/double quotes, comments and an optional `export` prefix. Values are literal: it does not run shell commands, expand `$HOME`, resolve `~`, perform nested substitution or interpret escape sequences. Use absolute paths in personal settings. Relative paths in the JSON config resolve against its directory; the config file path itself resolves against the CLI's current directory.
+
+`.env`, `.env.*` and `*.local.json` are ignored by Git; only `.env.example` is tracked. Never add real credentials to the example. Loading an env file does not automatically pass its variables to provider workers or authenticate GitHub CLI: use saved CLI logins, or intentionally map a credential into an agent's `env` only when required. Quota helper processes still have their documented environment behavior.
+
 ## Agent and quota configuration
 
 ### Codex

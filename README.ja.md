@@ -87,6 +87,40 @@ agent-task-scheduler approve --config /path/to/scheduler.json --task alice.proje
 
 実行を始めたタスクのタイトル・本文・メタデータを変更した場合、古い会話との食い違いを防ぐため処理を停止します。元に戻すか、新しいIssue・タスクIDを使ってください。
 
+## 個人設定を環境変数で指定する
+
+[個人設定用のJSON](examples/personal-scheduler.json)と[.env.example](.env.example)を使うと、リポジトリ名や作業フォルダを共有設定に書かずに済みます。
+
+```sh
+cp .env.example .env
+# .envを編集し、リポジトリ・作業場所・状態保存先を設定
+agent-task-scheduler plan --env-file .env
+agent-task-scheduler watch --env-file .env
+```
+
+`.env`内の`AGENT_SCHEDULER_CONFIG`が設定ファイルを指します。`--config`を指定した場合はそちらを優先します。`.env`は自動では読み込まず、`--env-file`で指定したときだけ読みます。既存の環境変数は.envの値より優先します。
+
+| 変数 | 内容 | 初期値 |
+|---|---|---|
+| `AGENT_SCHEDULER_CONFIG` | 設定ファイル | `--config`を省く場合は必須 |
+| `AGENT_TASK_REPOSITORY` | GitHubの`owner/repo` | 必須 |
+| `AGENT_TASK_WORKSPACE` | ローカルリポジトリ | 必須 |
+| `AGENT_TASK_STATE_DIR` | 非公開の状態保存先 | 必須 |
+| `AGENT_TASK_LABEL` | 取り込むIssueラベル | `agent-ready` |
+| `AGENT_TASK_MAX_PARALLEL` | 最大並列数 | `3` |
+| `AGENT_TASK_POLL_INTERVAL_MS` | 監視間隔（ミリ秒） | `60000` |
+| `AGENT_TASK_RESERVE_PERCENT` | 短期枠の予約残量 | `20` |
+| `AGENT_TASK_WEEKLY_RESERVE_PERCENT` | 週次枠の予約残量 | `30` |
+| `AGENT_TASK_CODEX_COMMAND` | Codex実行ファイル | `codex` |
+
+JSONの文字列値には`${NAME}`と`${NAME:-default}`を使えます。必須変数が未設定・空なら実行前にエラーにします。監視間隔や並列数などの数値も検証します。同じ方式でMarkdown・JSON入力の場所、Claudeの実行ファイル、モデル名、明示的なエージェント環境変数も設定できます。
+
+.envは`KEY=value`、単純な引用符、コメント、任意の`export`接頭辞に対応します。値は文字どおりに扱い、シェル実行、`$HOME`、`~`、入れ子の変数展開、エスケープの解釈は行いません。個人設定には絶対パスを使ってください。JSON内の相対パスは設定ファイルの場所から、設定ファイル自体の相対パスは現在の作業フォルダから解決します。
+
+`.env`、`.env.*`、`*.local.json`はGit対象外で、`.env.example`だけを共有します。例に本物の認証情報を書かないでください。.envを読み込んでも、そこにある秘密情報をワーカーへ自動では渡しません。GitHub CLIの認証にも自動では使用しないため、通常はCLIの保存済みログインを使ってください。
+
+ライブラリでも`schedulerFromConfig(file, { envFile, env })`が使えます。`process.env`自体は書き換えません。
+
 ## Codexの設定
 
 ```json

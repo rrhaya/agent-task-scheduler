@@ -42,6 +42,10 @@ export interface SchedulerOptions {
 }
 export class Scheduler { constructor(options: SchedulerOptions); store: StateStore; agents: Record<string, AgentAdapter>; plan(): Promise<{ id: string; allowed: boolean; reason: string; agent?: string }[]>; run(options?: { watch?: boolean; signal?: AbortSignal }): Promise<SchedulerState> }
 export class GitWorktreeManager { constructor(stateDirectory: string); prepare(task: Task, record?: Partial<TaskRecord>): Promise<{ workspace: string; branch?: string }> }
-export function schedulerFromConfig(file: string, options?: Pick<SchedulerOptions, 'onEvent'>): Promise<Scheduler>;
+export function schedulerFromConfig(file?: string, options?: Pick<SchedulerOptions, 'onEvent'> & { envFile?: string; env?: Record<string, string | undefined> }): Promise<Scheduler>;
 
 export class GitHubIssuesSource implements TaskSource { constructor(options: { repository: string; cwd: string; labels?: string[]; agent?: string; command?: string; maxIssues?: number; baseDir?: string }); list(): Promise<Task[]> }
+
+export function parseEnvFile(text: string): Record<string, string>;
+export function loadEnvironment(options?: { envFile?: string; env?: Record<string, string | undefined> }): Promise<Record<string, string | undefined>>;
+export function expandConfigEnvironment<T>(value: T, env: Record<string, string | undefined>): T;

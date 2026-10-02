@@ -3,3 +3,10 @@ node_modules/
 .codex-queue/
 .agent-scheduler/
 *.tgz
+
+# Personal configuration and credentials
+.env
+.env.*
+!.env.example
+scheduler.local.json
+*.local.json

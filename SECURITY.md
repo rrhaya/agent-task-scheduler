@@ -31,6 +31,12 @@ Regression tests exercise option separation, session-ID validation, reserved IDs
 
 回帰テストと既存の状態管理テストを実行しています。実モデルへの攻撃試行や、Claude Code実機での検証は行っていません。
 
+## Personal configuration / 個人設定
+
+Environment files are explicit opt-in (`--env-file`), not auto-discovered from the working tree. The parser performs no shell evaluation, nested substitution, or global environment mutation. Placeholders expand JSON string values after JSON parsing, not JSON source text or keys. Process variables take precedence. Environment values are trusted operator settings; keep `.env` private. Do not source untrusted dotenv files into a shell. `.env` and local JSON settings are ignored by Git; loading them does not automatically pass their credentials to provider workers.
+
+.envは明示的に指定したファイルだけを読み込みます。シェル実行やグローバル環境の変更は行いません。JSON解析後の文字列だけを展開するため、値に引用符があっても新しい設定項目を注入できません。個人設定は信頼済みの設定として扱い、非公開で保管してください。
+
 ## Reporting / 報告
 
 Do not post tokens, private task bodies or sensitive logs in public Issues. If GitHub's private vulnerability reporting is enabled, use the repository's **Security → Report a vulnerability** flow. Otherwise contact the repository owner privately before posting sensitive details. This repository does not yet advertise a dedicated security email or a guaranteed response SLA.
