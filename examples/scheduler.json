@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "stateDir": "../.agent-scheduler",
+  "sources": [
+    { "type": "json", "path": "tasks.json" },
+    { "type": "markdown-directory", "path": "task-folder" }
+  ],
+  "agents": {
+    "codex": { "type": "codex", "sandbox": "workspace-write" },
+    "claude": {
+      "type": "claude-code",
+      "allowedTools": ["Read", "Glob", "Grep", "Edit", "Write"],
+      "quota": { "type": "command", "argv": ["limitping", "status", "--json"] }
+    }
+  },
+  "maxParallel": 3,
+  "pollIntervalMs": 60000,
+  "policy": { "reservePercent": 20, "weeklyReservePercent": 30, "safetyFactor": 1.5 }
+}

@@ -1,18 +1,26 @@
 {
-  "name": "codex-task-queue",
-  "version": "0.5.2",
-  "description": "Turn product and development docs into executable Codex workflows, then run them with parallel subagents.",
+  "name": "agent-task-scheduler",
+  "version": "0.1.0",
+  "description": "Quota-aware parallel task scheduler and library for Codex, Claude Code, and custom AI agent adapters.",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "codex-task-queue": "scripts/codex-task-queue.mjs"
+    "codex-task-queue": "scripts/codex-task-queue.mjs",
+    "agent-task-scheduler": "bin/agent-task-scheduler.mjs"
   },
   "files": [
     "agents/",
     "references/",
     "scripts/",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "lib/",
+    "bin/",
+    "examples/",
+    "docs/",
+    "README.ja.md",
+    "SECURITY.md",
+    ".env.example"
   ],
   "scripts": {
     "test": "node --test tests/*.test.mjs",
@@ -37,10 +45,17 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Grey-G/codex-task-queue.git"
+    "url": "git+https://github.com/rrhaya/agent-task-scheduler.git"
   },
   "bugs": {
-    "url": "https://github.com/Grey-G/codex-task-queue/issues"
+    "url": "https://github.com/rrhaya/agent-task-scheduler/issues"
   },
-  "homepage": "https://github.com/Grey-G/codex-task-queue#readme"
+  "homepage": "https://github.com/rrhaya/agent-task-scheduler#readme",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.mjs"
+    }
+  },
+  "types": "lib/index.d.ts"
 }
