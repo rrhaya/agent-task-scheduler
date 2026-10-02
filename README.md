@@ -1,5 +1,7 @@
 # Agent Task Scheduler
 
+**English** | [日本語](README.ja.md)
+
 A local library and CLI that turns **GitHub Issues or your own task files** into parallel work for **Codex, Claude Code, or custom agent adapters**, while respecting reported subscription quotas.
 
 Forked from [Grey-G/codex-task-queue](https://github.com/Grey-G/codex-task-queue). The MIT license, original implementation, and original `codex-task-queue` CLI are retained. See [the upstream README](docs/UPSTREAM_README.md). The new scheduler is an independent module: it does not invoke the legacy runner's automatic commit/merge path.
@@ -224,3 +226,9 @@ npm run pack:dry-run
 Tests use fake vendor processes plus real temporary Git worktrees. They cover quota reservations, same-account pools, weekly exhaustion, exact-session resume, missing sessions, crash recovery, GitHub filtering, dependencies, cancellation and read-only planning. No inference calls are made by the tests. Codex quota reading has also been verified with the installed official CLI. Claude Code is not installed on the development machine, so real Claude execution remains unverified.
 
 Not included: a web UI, published npm package, OS-service installation, automatic merging, live cost learning, hard total-spend enforcement, arbitrary warmup catch-up, or automatic API/provider billing failover. The legacy CLI has its upstream behavior; use the **new** `agent-task-scheduler` entrypoint for the quota-aware scheduler.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for trust boundaries, fixed findings, and residual risks. Worker environments inherit only selected OS/runtime settings. API keys, GitHub tokens, cloud credentials and `NODE_OPTIONS` are not inherited by default; intentionally needed variables must be explicitly configured in the agent’s `env`. State directories must be owned by the current user and mode `0700` on Unix; state files are `0600`. Logs are created exclusively and capped at 50 MB per attempt; worker event lines are capped at 1 MB. Quota-reader commands remain trusted operator configuration and inherit the scheduler environment.
+
+Git worktrees isolate changes, **not security permissions**. Issue bodies, repository hooks, plugins, tests and instructions can influence the agent or execute code. Claude tool allowlists configure auto-approval; they do not constitute an OS sandbox. Use a disposable VM/container with narrowly scoped credentials for untrusted inputs. The retained upstream CLI has a different permission and automatic-integration model; these new protections do not retrofit its execution paths.
