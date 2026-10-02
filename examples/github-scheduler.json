@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "stateDir": "../.agent-scheduler",
+  "sources": [
+    {
+      "type": "github-issues",
+      "repository": "YOUR_NAME/YOUR_REPOSITORY",
+      "cwd": "/absolute/path/to/local/checkout",
+      "labels": ["agent-ready"],
+      "agent": "auto"
+    }
+  ],
+  "agents": {
+    "codex": { "type": "codex", "sandbox": "workspace-write" },
+    "claude": {
+      "type": "claude-code",
+      "allowedTools": ["Read", "Glob", "Grep", "Edit", "Write"],
+      "quota": { "type": "command", "argv": ["limitping", "status", "--json"] }
+    }
+  },
+  "maxParallel": 3,
+  "policy": { "reservePercent": 20, "weeklyReservePercent": 30, "safetyFactor": 1.5 }
+}

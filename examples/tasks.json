@@ -1,0 +1,21 @@
+{
+  "tasks": [
+    {
+      "id": "fix-retry",
+      "title": "Fix retry handling",
+      "cwd": "/absolute/path/to/your/repository",
+      "agent": "codex",
+      "priority": 10,
+      "estimatedMinutes": 15,
+      "estimatePercent": { "five_hour": 5, "weekly": 1 },
+      "prompt": "Inspect retry handling. Fix one reproducible bug and run relevant checks. Report the changed files, evidence, and any remaining issues."
+    },
+    {
+      "id": "document-retry",
+      "cwd": "/absolute/path/to/your/repository",
+      "agent": "claude",
+      "dependsOn": ["fix-retry"],
+      "prompt": "Document the retry behavior after the reviewed fix has been integrated into the repository."
+    }
+  ]
+}
